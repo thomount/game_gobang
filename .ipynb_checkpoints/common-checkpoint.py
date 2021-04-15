@@ -27,12 +27,13 @@ class Chessboard:
             for k in range(zoom-1):
                 print()
             
-    def build_from_vec(self, v, history):
-        self.size = len(v)
-        self.history = history
+    def copy(self):
+        ret = self.__class__(self.size)
+        ret.history = []
         for i in range(self.size):
             for j in range(self.size):
-                self.board[i][j] = v[i][j]
+                ret.board[i][j] = self.board[i][j]
+        return ret
     def build_from_file(self, f):
         #TODO
         pass

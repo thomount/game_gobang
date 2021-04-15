@@ -1,7 +1,8 @@
 class ai_base:
     # pure random
-    def __init__(self, size):
+    def __init__(self, size, name):
         self.size = size
+        self.name = name
     def reset(self, color):
         # set color
         self.color = color

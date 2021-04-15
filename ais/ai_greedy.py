@@ -1,18 +1,16 @@
 from .ai_base import ai_base
 import random
-class ai_random(ai_base):
-    def __init__(self, size, name='ai_random'):
-        super().__init__(size, name)
-    def step(self, chessboard, lastMove, result):
-        pool = []
-        for i in range(self.size):
-            for j in range(self.size):
-                if chessboard[i][j] == 0:
-                    pool.append((i, j))
-        return random.choice(pool)
+def estimate(chessboard):
+    score = [0,0]
+    win_flag = chessboard.isWin()
+    if win_flag in [1, 2]:
+        score[win_flag-1] = 1e8
+        score[2-win_flag] = -1e8
     
-class ai_random_near(ai_base):
-    def __init__(self, size, name='ai_random_near'):
+    return score
+
+class ai_greedy(ai_base):
+    def __init__(self, size, name='ai_greedy'):
         super().__init__(size, name)
     def step(self, chessboard, lastMove, result):
         pool = []
@@ -28,7 +26,15 @@ class ai_random_near(ai_base):
                                 exist_flag = 1
                                 break
                     if exist_flag == 1:
-                        pool.append((i, j))
-        return random.choice(pool)
+                        virtual_board = chessboard.copy()
+                        virtual_board.step(self.color, (i, j))
+                        score = estimate(virtual_board)
+                        pool.append([i, j, score[self.color-1]])
+                        
+        pool.sort(key=lambda x: -x[2])
+        while pool[-1][2] != pool[0][2]:
+            pool = pool[:-1]
+        return tuple(random.choice(pool)[:-1])
+        
     
         

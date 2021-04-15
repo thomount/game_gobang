@@ -1,6 +1,6 @@
 import common as cm
 from ais.ai_random import ai_random as AI_1
-from ais.ai_random import ai_random_near as AI_2
+from ais.ai_greedy import ai_greedy as AI_2
 
 class Game:
     def __init__(self):
@@ -40,16 +40,19 @@ if __name__ == '__main__':
     game = Game()
     ai_1 = AI_1(cm.GB_size)
     ai_2 = AI_2(cm.GB_size)
-    #game.start(ai_1, ai_2, True)
-    count = [0,0]
-    for i in range(100):
-        res = game.start(ai_1, ai_2, False)
-        if res == -1:
-            count[0] += 1
-            count[1] += 1
-        elif res in [1, 2]:
-            count[res-1] += 3
-        print('rount %d finish' % (i+1))
-    print(f'100 round score: %.2f : %.2f' % (count[0]/(count[0]+count[1])*100, count[1]/(count[0]+count[1])*100))
+    def single_game():
+        game.start(ai_1, ai_2, True)
+    def multi_game():
+        count = [0,0]
+        for i in range(100):
+            res = game.start(ai_1, ai_2, False)
+            if res == -1:
+                count[0] += 1
+                count[1] += 1
+            elif res in [1, 2]:
+                count[res-1] += 3
+            print('rount %d finish, winner is %d' % (i+1, res))
+        print(f'100 round score: %.2f : %.2f' % (count[0]/(count[0]+count[1])*100, count[1]/(count[0]+count[1])*100))
+    multi_game()
         
     
