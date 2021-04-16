@@ -1,8 +1,5 @@
 import common as cm
-from ais.ai_greedy import ai_greedy as AI_1
-from ais.ai_search import ai_search as AI_2
-from ais.ai_search import ai_search_q as AI_3
-from ais.ai_base import ai_base as AI_0
+import ai_menu as ai
 import time
 
 class Game:
@@ -45,16 +42,11 @@ class Game:
         
 if __name__ == '__main__':
     game = Game()
-    ai_1 = AI_1(cm.GB_size)
-    ai_2 = AI_2(cm.GB_size)
-    ai_3 = AI_3(cm.GB_size)
-    ai_0 = AI_0(cm.GB_size)
-    l = ai_0
-    r = ai_3
-    def single_game():
+
+    def single_game(l, r):
         game.start(l, r, True)
 
-    def multi_game():
+    def multi_game(l, r):
         count = [0,0]
         for i in range(20):
             res = game.start(l, r, False)
@@ -78,7 +70,10 @@ if __name__ == '__main__':
             game.detail[2].show()
 
         print(f'20 round score: %.2f : %.2f' % (count[0]/(count[0]+count[1])*100, count[1]/(count[0]+count[1])*100))
-    #multi_game()
-    single_game()
+        
+    l = ai.get_AI(0)
+    r = ai.get_AI(4)
+    #multi_game(l, r)
+    single_game(l, r)
         
     

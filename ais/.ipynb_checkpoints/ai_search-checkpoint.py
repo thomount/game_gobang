@@ -116,6 +116,8 @@ class ai_search(ai_base):
 class ai_search_q(ai_base):
     def __init__(self, size, name='ai_search_quick'):
         super().__init__(size, name)
+        self.depth = 3
+        self.width = 10
     def step(self, chessboard, lastMove, result):
         if result != 0:
             return None
@@ -136,7 +138,7 @@ class ai_search_q(ai_base):
                     if exist_flag == 1:
                         ava.add((i, j))
                         
-        res = self.search(chessboard, 3, self.color, ava)
+        res = self.search(chessboard, self.depth, self.color, ava)
         return res[1]
     def estimate(self, chessboard, color, ava):  # color先手的胜率
         score = 0.5
@@ -195,33 +197,36 @@ class ai_search_q(ai_base):
             if c != color: K += 0.5
             for d in range(4):
                 count = 2
-                plus = 2
+                max_len = 1
                 for step in range(1, 5):
                     pos = (i+ldir[d][0]*step, j+ldir[d][1]*step)
                     if chessboard.isLegal(pos):
                         if chessboard[pos[0]][pos[1]] == c:
-                            count += plus
+                            count += 2
+                            max_len += 1
                         elif chessboard.isEmpty(pos):
-                            plus >>= 1
-                            count += plus
+                            count += 1
+                            max_len += 1
                         else:
                             break
                     else:
                         break
-                plus = 2
+
                 for step in range(1, 5):
                     pos = (i+rdir[d][0]*step, j+rdir[d][1]*step)
                     if chessboard.isLegal(pos):
                         if chessboard[pos[0]][pos[1]] == c:
-                            count += plus
+                            count += 2
+                            max_len += 1
                         elif chessboard.isEmpty(pos):
-                            plus >>= 1
-                            count += plus
+                            count += 1
+                            max_len += 1
                         else:
                             break
                     else:
                         break
-                score += K*(3**count)
+                if max_len > 4:
+                    score += K*(3**count)
         return score
     def search(self, chessboard, depth, color, available): # color 走的先手胜率
         win_flag = chessboard.isWin()
@@ -239,8 +244,8 @@ class ai_search_q(ai_base):
         for pos in available:
             pool.append((pos, self.estimate_point(chessboard, pos, color)))
         pool.sort(key=lambda x: -x[1])
-        if len(pool) > 10:
-            pool = pool[:10]
+        if len(pool) > self.width:
+            pool = pool[:self.width]
         min_score = 3
         best_move = None
         for item in pool:
@@ -257,6 +262,52 @@ class ai_search_q(ai_base):
                     break
         return 1-min_score, best_move
 
+class ai_search_calc(ai_search_q):
+    def __init__(self, size, name = 'ai_calculater'):
+        super().__init__(size, name)
+        self.depth = 6
+        self.width = 4
+    def estimate_point(self, chessboard, P, color):
+        i, j = P[0], P[1]
+        ldir = [(-1, 0), (-1, -1), (0, -1), (1, -1)]
+        rdir = [(1, 0), (1, 1), (0, 1), (-1, 1)]
+        score = 0
+        for c in range(1, 3):
+            K = 1
+            if c != color: K += 0.5
+            for d in range(4):
+                count = 1
+                max_len = 1
+                for step in range(1, 5):
+                    pos = (i+ldir[d][0]*step, j+ldir[d][1]*step)
+                    if chessboard.isLegal(pos):
+                        if chessboard[pos[0]][pos[1]] == c:
+                            count += 2+(5-step)/5
+                            max_len += 1
+                        elif chessboard.isEmpty(pos):
+                            count += 1
+                            max_len += 1
+                        else:
+                            break
+                    else:
+                        break
+
+                for step in range(1, 5):
+                    pos = (i+rdir[d][0]*step, j+rdir[d][1]*step)
+                    if chessboard.isLegal(pos):
+                        if chessboard[pos[0]][pos[1]] == c:
+                            count += 2+(5-step)/5
+                            max_len += 1
+                        elif chessboard.isEmpty(pos):
+                            count += 1
+                            max_len += 1
+                        else:
+                            break
+                    else:
+                        break
+                if max_len > 4:
+                    score += K*(3**count)
+        return score
 if __name__ == '__main__':
     chess = Gobang_board(GB_size)
     print(chess.step(1, (5,5)))
