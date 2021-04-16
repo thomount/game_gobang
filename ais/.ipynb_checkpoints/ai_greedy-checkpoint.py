@@ -1,11 +1,11 @@
-from .ai_base import ai_base
+from ais.ai_base import ai_base
 import random
 def estimate(chessboard):
-    score = [0,0]
+    score = [1, 1]
     win_flag = chessboard.isWin()
     if win_flag in [1, 2]:
-        score[win_flag-1] = 1e8
-        score[2-win_flag] = -1e8
+        score[win_flag-1] = 3
+        score[2-win_flag] = 0
     
     return score
 
@@ -13,6 +13,10 @@ class ai_greedy(ai_base):
     def __init__(self, size, name='ai_greedy'):
         super().__init__(size, name)
     def step(self, chessboard, lastMove, result):
+        if result != 0:
+            return None
+        if lastMove == None:
+            return ((self.size)//2,(self.size)//2)
         pool = []
         for i in range(self.size):
             for j in range(self.size):

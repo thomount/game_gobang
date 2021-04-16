@@ -1,4 +1,4 @@
-from .ai_base import ai_base
+from ais.ai_base import ai_base
 import random
 class ai_random(ai_base):
     def __init__(self, size, name='ai_random'):
@@ -15,6 +15,10 @@ class ai_random_near(ai_base):
     def __init__(self, size, name='ai_random_near'):
         super().__init__(size, name)
     def step(self, chessboard, lastMove, result):
+        if result != 0:
+            return None
+        if lastMove == None:
+            return ((self.size)//2,(self.size)//2)
         pool = []
         for i in range(self.size):
             for j in range(self.size):

@@ -18,6 +18,7 @@ class Chessboard:
             return False
     def reset(self):
         self.board = [[0 for i in range(self.size)] for j in range(self.size)]
+        self.history = []
     def show(self, zoom=1):
         for i in range(self.size):
             for k in range(zoom):
