@@ -1,5 +1,5 @@
 map = ['.', '#', 'O']
-GB_size = 15
+GB_size = 13
 class Chessboard:
     def __init__(self, size=GB_size):
         self.size = size
@@ -38,9 +38,15 @@ class Chessboard:
     def build_from_file(self, f):
         #TODO
         pass
+    def set(self, board):
+        for i in range(self.size):
+            for j in range(self.size):
+                self.board[i][j] = board[i][j]
     
     def __getitem__(self, x):
         return self.board[x]
+    def __len__(self):
+        return self.size
 class Gobang_board(Chessboard):
     def __init__(self, size=GB_size):
         super().__init__(size)

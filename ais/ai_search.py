@@ -244,8 +244,17 @@ class ai_search_q(ai_base):
         for pos in available:
             pool.append((pos, self.estimate_point(chessboard, pos, color)))
         pool.sort(key=lambda x: -x[1])
+        index = len(pool)-1
+        if depth == self.depth:
+            print(pool)
+
+        while (pool[index][1] < pool[0][1]*0.3):
+            index -= 1
+        pool = pool[:index+1]
         if len(pool) > self.width:
-            pool = pool[:self.width]
+            first = pool[:self.width//2]
+            second = random.sample(pool[self.width//2:], self.width//2)
+            pool = first + second
         min_score = 3
         best_move = None
         for item in pool:
@@ -255,6 +264,8 @@ class ai_search_q(ai_base):
             ret = self.search(chessboard, depth-1, 3-color, self.new_ava(chessboard, available, pos))
             chessboard[pos[0]][pos[1]] = 0
             move, res = ret[1], ret[0]
+            if depth == self.depth:
+                print(item, 'rate = %.3f' % (1-res))
             if res < min_score:
                 min_score = res
                 best_move = (pos[0], pos[1])
@@ -266,8 +277,9 @@ class ai_search_calc(ai_search_q):
     def __init__(self, size, name = 'ai_calculater'):
         super().__init__(size, name)
         self.depth = 6
-        self.width = 4
+        self.width = 6
     def estimate_point(self, chessboard, P, color):
+        # have some problems recognizing 3+3 situation
         i, j = P[0], P[1]
         ldir = [(-1, 0), (-1, -1), (0, -1), (1, -1)]
         rdir = [(1, 0), (1, 1), (0, 1), (-1, 1)]
@@ -275,18 +287,22 @@ class ai_search_calc(ai_search_q):
         for c in range(1, 3):
             K = 1
             if c != color: K += 0.5
+            count_3 = 0
+            count_4 = 0
+            count_5 = 0
             for d in range(4):
-                count = 1
+                count = 3
                 max_len = 1
                 for step in range(1, 5):
                     pos = (i+ldir[d][0]*step, j+ldir[d][1]*step)
                     if chessboard.isLegal(pos):
                         if chessboard[pos[0]][pos[1]] == c:
-                            count += 2+(5-step)/5
+                            count += 3
                             max_len += 1
                         elif chessboard.isEmpty(pos):
                             count += 1
                             max_len += 1
+                            break
                         else:
                             break
                     else:
@@ -296,17 +312,32 @@ class ai_search_calc(ai_search_q):
                     pos = (i+rdir[d][0]*step, j+rdir[d][1]*step)
                     if chessboard.isLegal(pos):
                         if chessboard[pos[0]][pos[1]] == c:
-                            count += 2+(5-step)/5
+                            count += 3
                             max_len += 1
                         elif chessboard.isEmpty(pos):
                             count += 1
                             max_len += 1
+                            break
                         else:
                             break
                     else:
                         break
                 if max_len > 4:
-                    score += K*(3**count)
+                    if count == 11:
+                        score += 10*K
+                        count_3 += 1
+                    elif count >= 15:
+                        score += 10000*K
+                        count_5 += 1
+                    elif count in [13, 14]:
+                        if count == 13:
+                            score += 20*K
+                        else:
+                            score += 100*K
+                        count_4 += 1
+            if count_3 + count_4 + count_5 > 1:
+                score += 1000*K
+                    
         return score
 if __name__ == '__main__':
     chess = Gobang_board(GB_size)

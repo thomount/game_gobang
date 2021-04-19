@@ -9,6 +9,8 @@ class ai_base:
     def step(self, chessboard, lastMove, result):
         # result: current isWin result
         # return next move
+        if result != 0:
+            return None
         s = input().split()
         x, y = int(s[0]), int(s[1])
         return (x, y)

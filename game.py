@@ -23,13 +23,16 @@ class Game:
                 print("player", turn_n%2+1, 'make a wrong move on', nextPos)
                 break
             turn_n += 1
-            #print(turn_n, nextPos)
+            if flag == False:
+                print(turn_n, nextPos)
             if flag == True:
                 self.board.show()
                 print()
         result = self.board.isWin()    
         ai_1.step(self.board, self.board.history[-1], result)
         ai_2.step(self.board, self.board.history[-1], result)
+        if flag == False:
+            print()
         if flag == True:
             if result == -1:
                 print('tie!')
@@ -72,7 +75,7 @@ if __name__ == '__main__':
         print(f'20 round score: %.2f : %.2f' % (count[0]/(count[0]+count[1])*100, count[1]/(count[0]+count[1])*100))
         
     l = ai.get_AI(0)
-    r = ai.get_AI(4)
+    r = ai.get_AI(5)
     #multi_game(l, r)
     single_game(l, r)
         
